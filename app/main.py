@@ -3,17 +3,16 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-# Налаштовуємо логування
+from app.routers import projects, tasks
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("taskforge")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Код ініціалізації ресурсів
-    logger.info("Initializing TaskForge resources (Database pools, Cache)...")
+    logger.info("Initializing TaskForge resources...")
     yield
-    # Код очищення ресурсів
     logger.info("Releasing TaskForge resources...")
 
 
@@ -23,6 +22,10 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+# Підключаємо модулі маршрутів
+app.include_router(projects.router)
+app.include_router(tasks.router)
 
 
 @app.get("/")
